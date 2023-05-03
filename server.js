@@ -1,19 +1,24 @@
-const express = require('express')
-const morgan = require('morgan')
-const cors = require('cors')
+/** @format */
 
-const routes = require('./routes/expoing.routes')
+const express = require("express");
+const morgan = require("morgan");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
-const app = express()
+const routes = require("./routes/expoing.routes");
 
-const port = 4000
+const app = express();
 
-app.use(cors())
-app.use(morgan('dev'))
+const port = 4000;
 
-app.use(routes)
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-app.use(express.json())
+app.use(cors());
+app.use(morgan("dev"));
 
+app.use(routes);
 
-app.listen(port, () => console.log(`Listening in port ${port}...`))
+app.use(express.json());
+
+app.listen(port, () => console.log(`Listening in port ${port}...`));
