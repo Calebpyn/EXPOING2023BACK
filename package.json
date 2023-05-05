@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
-    "build": "npx webpack build",
-    "start": "webpack serve --open"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
