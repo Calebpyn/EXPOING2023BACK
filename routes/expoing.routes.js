@@ -266,7 +266,7 @@ function authJuez(req, res, next) {
 }
 function checkUserProject(req, res, next) {
   const idProyecto = req.params.proyecto; // suponiendo que el idProyecto está en la ruta
-  const idUsuario = req.body.usuario; // suponiendo que el idUsuario del usuario está disponible en req.user
+  const idUsuario = req.body.correo; // suponiendo que el idUsuario del usuario está disponible en req.user
 
   pool.getConnection((err, connection) => {
     if (err) {
