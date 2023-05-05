@@ -234,6 +234,46 @@ router.get("/proyecto/:proyecto", checkUserProject, (req, res) => {
   });
 });
 
+
+//Despliegue de proyectos
+router.get("/proyecto", (req, res) => {
+  // const proyecto = req.params.proyecto;
+  // const userProject = req.userProject || {}; // proyecto del usuario que está haciendo la búsqueda
+
+  // verifica si el usuario tiene acceso de edición
+  // const puedeEditar =
+  //   userProject && userProject.idProyecto == parseInt(proyecto, 10);
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(`error connecting to database: ${err}`);
+      res.status(500).send("Error connecting to database");
+      return;
+    }
+
+    connection.query(
+      "SELECT * FROM Proyecto;",
+      [proyecto],
+      (err, rows) => {
+        connection.release();
+        if (err) {
+          console.log(`error executing query: ${err}`);
+          res.status(500).send(err);
+          return;
+        }
+        const proyecto = rows[0];
+        const data = {
+          ...proyecto,
+          editable: puedeEditar,
+        };
+
+        res.send(data); // pasar el valor de puedeEditar a la plantilla
+      }
+    );
+  });
+});
+
+
 function authJuez(req, res, next) {
   var correo = req.body.correo;
   pool.getConnection((err, connection) => {
