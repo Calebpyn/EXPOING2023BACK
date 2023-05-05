@@ -20,5 +20,6 @@ app.use(morgan("dev"));
 app.use(routes);
 
 app.use(express.json());
+app.set("view engine", "pug");
 
 app.listen(port, () => console.log(`Listening in port ${port}...`));
