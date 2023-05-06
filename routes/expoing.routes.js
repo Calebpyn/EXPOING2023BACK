@@ -16,7 +16,7 @@ const pool = mysql.createPool({
 });
 
 //obtener las calificaciones de un proyecto
-router.get("/calificaciones/:proyecto", authJuez, (req, res) => {
+router.get("/calificaciones/:proyecto", (req, res) => {
   const correo = req.body.correo;
   const proyecto = req.params.proyecto;
   pool.getConnection((err, connection) => {
@@ -55,7 +55,7 @@ router.get("/calificaciones/:proyecto", authJuez, (req, res) => {
 });
 
 //obtener las preguntas de una categoria
-router.get("/pregunta/:categoria", authJuez, (req, res) => {
+router.get("/pregunta/:categoria", (req, res) => {
   const categoria = req.params.categoria;
   pool.getConnection((err, connection) => {
     if (err) {
