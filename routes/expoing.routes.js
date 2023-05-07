@@ -16,7 +16,7 @@ const pool = mysql.createPool({
 });
 
 //obtener las calificaciones de un proyecto
-router.get("/calificaciones/:proyecto", authJuez, (req, res) => {
+router.get("/calificaciones/:proyecto", (req, res) => {
   const correo = req.body.correo;
   const proyecto = req.params.proyecto;
   pool.getConnection((err, connection) => {
@@ -55,7 +55,7 @@ router.get("/calificaciones/:proyecto", authJuez, (req, res) => {
 });
 
 //obtener las preguntas de una categoria
-router.get("/pregunta/:categoria", authJuez, (req, res) => {
+router.get("/pregunta/:categoria", (req, res) => {
   const categoria = req.params.categoria;
   pool.getConnection((err, connection) => {
     if (err) {
@@ -82,7 +82,6 @@ router.get("/pregunta/:categoria", authJuez, (req, res) => {
 //Calificar una pregunta de un proyecto
 router.post(
   "/calificar/:proyecto/:pregunta/:calificacion",
-  authJuez,
   (req, res) => {
     const pregunta = req.params.pregunta;
     const proyecto = req.params.proyecto;
@@ -113,7 +112,7 @@ router.post(
 );
 
 //para bloquear las calificaciones, se hace un update al atributo bloquear
-router.put("/bloquear/:proyecto", authJuez, (req, res) => {
+router.put("/bloquear/:proyecto", (req, res) => {
   const proyecto = req.params.proyecto;
   const correo = req.body.correo;
 
@@ -304,6 +303,10 @@ function authJuez(req, res, next) {
     );
   });
 }
+
+
+
+
 function checkUserProject(req, res, next) {
   const idProyecto = req.params.proyecto; // suponiendo que el idProyecto está en la ruta
   const idUsuario = req.body.correo; // suponiendo que el idUsuario del usuario está disponible en req.user
