@@ -233,7 +233,6 @@ router.get("/proyecto/:proyecto", checkUserProject, (req, res) => {
   });
 });
 
-
 //Despliegue de proyectos
 router.get("/proyecto", (req, res) => {
   // const proyecto = req.params.proyecto;
@@ -250,9 +249,38 @@ router.get("/proyecto", (req, res) => {
       return;
     }
 
+    connection.query("SELECT * FROM Proyecto;", [proyecto], (err, rows) => {
+      connection.release();
+      if (err) {
+        console.log(`error executing query: ${err}`);
+        res.status(500).send(err);
+        return;
+      }
+      const proyecto = rows[0];
+      const data = {
+        ...proyecto,
+        editable: puedeEditar,
+      };
+
+      res.send(data); // pasar el valor de puedeEditar a la plantilla
+    });
+  });
+});
+
+//despliegue de proyecto por categoria
+router.get("/proyectos/:categoria", (req, res) => {
+  const categoria = req.params.categoria;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(`error connecting to database: ${err}`);
+      res.status(500).send("Error connecting to database");
+      return;
+    }
+
     connection.query(
-      "SELECT * FROM Proyecto;",
-      [proyecto],
+      "SELECT * FROM Proyecto where categoria = ?;",
+      [categoria],
       (err, rows) => {
         connection.release();
         if (err) {
@@ -260,18 +288,12 @@ router.get("/proyecto", (req, res) => {
           res.status(500).send(err);
           return;
         }
-        const proyecto = rows[0];
-        const data = {
-          ...proyecto,
-          editable: puedeEditar,
-        };
 
-        res.send(data); // pasar el valor de puedeEditar a la plantilla
+        res.send(rows); // pasar el valor de puedeEditar a la plantilla
       }
     );
   });
 });
-
 
 function authJuez(req, res, next) {
   var correo = req.body.correo;
