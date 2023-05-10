@@ -16,7 +16,7 @@ const pool = mysql.createPool({
 });
 
 //obtener las calificaciones de un proyecto
-router.get("/calificaciones/:proyecto", (req, res) => {
+router.post("/calificaciones/:proyecto", (req, res) => {
   const correo = req.body.correo;
   const proyecto = req.params.proyecto;
   pool.getConnection((err, connection) => {
@@ -55,7 +55,7 @@ router.get("/calificaciones/:proyecto", (req, res) => {
 });
 
 //obtener las preguntas de una categoria
-router.get("/pregunta/:categoria", (req, res) => {
+router.post("/pregunta/:categoria", (req, res) => {
   const categoria = req.params.categoria;
   pool.getConnection((err, connection) => {
     if (err) {
@@ -197,7 +197,7 @@ router.put("/proyecto/:proyecto/links", checkUserProject, (req, res) => {
 });
 
 //desplegar un proyecto, y en caso de que el usuario sea parte del equipo sera editable
-router.get("/proyecto/:proyecto", checkUserProject, (req, res) => {
+router.post("/proyecto/:proyecto", checkUserProject, (req, res) => {
   const proyecto = req.params.proyecto;
   const userProject = req.userProject || {}; // proyecto del usuario que está haciendo la búsqueda
 
@@ -236,13 +236,6 @@ router.get("/proyecto/:proyecto", checkUserProject, (req, res) => {
 
 //Despliegue de proyectos
 router.get("/proyecto", (req, res) => {
-  // const proyecto = req.params.proyecto;
-  // const userProject = req.userProject || {}; // proyecto del usuario que está haciendo la búsqueda
-
-  // verifica si el usuario tiene acceso de edición
-  // const puedeEditar =
-  //   userProject && userProject.idProyecto == parseInt(proyecto, 10);
-
   pool.getConnection((err, connection) => {
     if (err) {
       console.log(`error connecting to database: ${err}`);
@@ -296,6 +289,30 @@ router.get("/proyectos/:categoria", (req, res) => {
   });
 });
 
+router.post("/pregunta/:categoria", authJuez, (req, res) => {
+  const categoria = req.params.categoria;
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(`error connecting to database: ${err}`);
+      res.status(500).send("Error connecting to database");
+      return;
+    }
+    connection.query(
+      "SELECT p.idPregunta, p.pregunta FROM Pregunta_Categoria pc JOIN Pregunta p ON pc.pregunta = p.idPregunta WHERE pc.categoria = ?",
+      [categoria],
+      (err, rows) => {
+        connection.release();
+        if (err) {
+          console.log(`error executing query: ${err}`);
+          res.status(500).send("Error executing query");
+          return;
+        }
+        res.send(rows);
+      }
+    );
+  });
+});
+
 function authJuez(req, res, next) {
   var correo = req.body.correo;
   pool.getConnection((err, connection) => {
@@ -326,6 +343,7 @@ function authJuez(req, res, next) {
     );
   });
 }
+
 function checkUserProject(req, res, next) {
   const idProyecto = req.params.proyecto; // suponiendo que el idProyecto está en la ruta
   const idUsuario = req.body.correo; // suponiendo que el idUsuario del usuario está disponible en req.user
