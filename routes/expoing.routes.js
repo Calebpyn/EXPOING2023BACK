@@ -16,7 +16,7 @@ const pool = mysql.createPool({
 });
 
 //obtener las calificaciones de un proyecto
-router.post("/calificaciones/:proyecto", authJuez, (req, res) => {
+router.post("/calificaciones/:proyecto", (req, res) => {
   const correo = req.body.correo;
   const proyecto = req.params.proyecto;
   pool.getConnection((err, connection) => {
@@ -55,7 +55,7 @@ router.post("/calificaciones/:proyecto", authJuez, (req, res) => {
 });
 
 //obtener las preguntas de una categoria
-router.post("/pregunta/:categoria", authJuez, (req, res) => {
+router.post("/pregunta/:categoria", (req, res) => {
   const categoria = req.params.categoria;
   pool.getConnection((err, connection) => {
     if (err) {
@@ -80,40 +80,36 @@ router.post("/pregunta/:categoria", authJuez, (req, res) => {
 });
 
 //Calificar una pregunta de un proyecto
-router.post(
-  "/calificar/:proyecto/:pregunta/:calificacion",
-  authJuez,
-  (req, res) => {
-    const pregunta = req.params.pregunta;
-    const proyecto = req.params.proyecto;
-    const calificacion = req.params.calificacion;
-    const correo = req.body.correo;
+router.post("/calificar/:proyecto/:pregunta/:calificacion", (req, res) => {
+  const pregunta = req.params.pregunta;
+  const proyecto = req.params.proyecto;
+  const calificacion = req.params.calificacion;
+  const correo = req.body.correo;
 
-    pool.getConnection((err, connection) => {
-      if (err) {
-        console.log(`error connecting to database: ${err}`);
-        res.status(500).send("Error connecting to database");
-        return;
-      }
-      connection.query(
-        "CALL guardar_calificacion(?,?,?,?)",
-        [correo, pregunta, proyecto, calificacion],
-        (err, rows) => {
-          connection.release();
-          if (err) {
-            console.log(`error executing query: ${err}`);
-            res.status(500).send(err);
-            return;
-          }
-          res.send(rows);
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(`error connecting to database: ${err}`);
+      res.status(500).send("Error connecting to database");
+      return;
+    }
+    connection.query(
+      "CALL guardar_calificacion(?,?,?,?)",
+      [correo, pregunta, proyecto, calificacion],
+      (err, rows) => {
+        connection.release();
+        if (err) {
+          console.log(`error executing query: ${err}`);
+          res.status(500).send(err);
+          return;
         }
-      );
-    });
-  }
-);
+        res.send(rows);
+      }
+    );
+  });
+});
 
 //para bloquear las calificaciones, se hace un update al atributo bloquear
-router.put("/bloquear/:proyecto", authJuez, (req, res) => {
+router.put("/bloquear/:proyecto", (req, res) => {
   const proyecto = req.params.proyecto;
   const correo = req.body.correo;
 
@@ -140,7 +136,7 @@ router.put("/bloquear/:proyecto", authJuez, (req, res) => {
 });
 
 //agregar links de proyecto
-router.put("/proyecto/:proyecto/links", checkUserProject, (req, res) => {
+router.put("/proyecto/:proyecto/links", (req, res) => {
   const proyecto = req.params.proyecto;
   const linkVideo = req.body.link_video || "";
   const linkZoom = req.body.link_zoom || "";
@@ -197,7 +193,7 @@ router.put("/proyecto/:proyecto/links", checkUserProject, (req, res) => {
 });
 
 //desplegar un proyecto, y en caso de que el usuario sea parte del equipo sera editable
-router.post("/proyecto/:proyecto", checkUserProject, (req, res) => {
+router.post("/proyecto/:proyecto", (req, res) => {
   const proyecto = req.params.proyecto;
   const userProject = req.userProject || {}; // proyecto del usuario que está haciendo la búsqueda
 
@@ -289,7 +285,7 @@ router.get("/proyectos/:categoria", (req, res) => {
   });
 });
 
-router.post("/pregunta/:categoria", authJuez, (req, res) => {
+router.post("/pregunta/:categoria", (req, res) => {
   const categoria = req.params.categoria;
   pool.getConnection((err, connection) => {
     if (err) {
