@@ -193,7 +193,7 @@ router.put("/proyecto/:proyecto/links", (req, res) => {
 });
 
 //desplegar un proyecto, y en caso de que el usuario sea parte del equipo sera editable
-router.post("/proyecto/:proyecto", (req, res) => {
+router.post("/proyecto/:proyecto", checkUserProject, (req, res) => {
   const proyecto = req.params.proyecto;
   const userProject = req.userProject || {}; // proyecto del usuario que está haciendo la búsqueda
 
@@ -231,7 +231,7 @@ router.post("/proyecto/:proyecto", (req, res) => {
 });
 
 //Despliegue de proyectos
-router.get("/proyecto", (req, res) => {
+router.get("/proyecto", checkUserProject, (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) {
       console.log(`error connecting to database: ${err}`);
@@ -269,7 +269,7 @@ router.get("/proyectos/:categoria", (req, res) => {
     }
 
     connection.query(
-      "SELECT * FROM Proyecto where categoria = ?;",
+      "SELECT * FROM Proyecto where categoria = ? order by numero_proyecto asc;",
       [categoria],
       (err, rows) => {
         connection.release();
