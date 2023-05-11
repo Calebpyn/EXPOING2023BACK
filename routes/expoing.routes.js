@@ -136,7 +136,7 @@ router.put("/bloquear/:proyecto", (req, res) => {
 });
 
 //agregar links de proyecto
-router.put("/proyecto/:proyecto/links", (req, res) => {
+router.put("/proyecto/:proyecto/links", checkUserProject, (req, res) => {
   const proyecto = req.params.proyecto;
   const linkVideo = req.body.link_video || "";
   const linkZoom = req.body.link_zoom || "";
